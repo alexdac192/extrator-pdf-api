@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Upload de PDF</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        #fileInput { margin-bottom: 10px; }
+        #uploadButton { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #uploadButton:hover { background-color: #0056b3; }
+        .response-block { margin-top: 20px; padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 5px; }
+        .response-block h3 { margin-top: 0; border-bottom: 1px solid #ccc; padding-bottom: 5px;}
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+    <h1>Ferramenta de Teste da API de PDF</h1>
+    
+    <!-- Adicionamos o atributo 'multiple' para permitir a seleção de vários arquivos -->
+    <input type="file" id="fileInput" accept=".pdf" multiple>
+    <br>
+    <button id="uploadButton">Enviar para Teste</button>
+
+    <h2>Respostas da API:</h2>
+    <div id="responseArea">
+        <p>Aguardando envio de arquivo(s)...</p>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const responseArea = document.getElementById('responseArea');
+
+        uploadButton.addEventListener('click', async () => {
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                responseArea.innerHTML = '<p style="color: red;">ERRO: Por favor, selecione um ou mais arquivos PDF primeiro.</p>';
+                return;
+            }
+
+            // Limpa a área de resposta antes de iniciar
+            responseArea.innerHTML = '<p>Processando arquivos...</p>';
+
+            // Itera sobre cada arquivo selecionado e processa um de cada vez
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Cria um bloco de resposta para este arquivo
+                const responseBlock = document.createElement('div');
+                responseBlock.className = 'response-block';
+                const title = document.createElement('h3');
+                title.textContent = `Resultado para: ${file.name}`;
+                const pre = document.createElement('pre');
+                pre.textContent = 'Enviando...';
+                responseBlock.appendChild(title);
+                responseBlock.appendChild(pre);
+
+                // Se for o primeiro arquivo, substitui a mensagem inicial. Senão, adiciona abaixo.
+                if (responseArea.childElementCount === 1 && responseArea.firstChild.tagName === 'P') {
+                    responseArea.innerHTML = '';
+                }
+                responseArea.appendChild(responseBlock);
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    pre.textContent = JSON.stringify(result, null, 2);
+
+                } catch (error) {
+                    pre.textContent = 'ERRO DE CONEXÃO: Não foi possível conectar ao servidor. Verifique se o app.py está rodando no terminal.\n\n' + error;
+                    pre.style.color = 'red';
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
+
