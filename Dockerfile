@@ -13,6 +13,6 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 # 5. Copiar todo o resto do nosso código (app.py, etc.) para a pasta de trabalho
 COPY . .
 
-# 6. O comando que será executado quando a "caixa" for ligada
-#    Isto inicia o nosso servidor Gunicorn
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+# 6. CORREÇÃO: O comando que será executado quando a "caixa" for ligada.
+#    Executamos o gunicorn diretamente.
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
