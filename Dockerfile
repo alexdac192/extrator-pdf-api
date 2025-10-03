@@ -1,8 +1,8 @@
 # 1. Usar a imagem Python completa para garantir que todas as bibliotecas do sistema estão presentes
 FROM python:3.11
 
-# 2. MUDANÇA: Instalar as dependências de sistema que o PyMuPDF precisa
-RUN apt-get update && apt-get install -y libgl1-mesa-glx
+# 2. MUDANÇA FINAL: Instalar a dependência de sistema com o nome correto para esta versão do Debian
+RUN apt-get update && apt-get install -y libgl1
 
 # 3. Definir a pasta de trabalho dentro do nosso "mini-computador"
 WORKDIR /app
@@ -18,4 +18,8 @@ COPY . .
 
 # 7. O comando que será executado quando a "caixa" for ligada.
 CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+
+### **O Último Passo (Prometo!)**
+
+
 
